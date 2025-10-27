@@ -12,6 +12,60 @@ from models.composicion.comedor import Comedor
 
 
 class TiendaMuebles:
+    def __init__(self):
+        """
+        Inicializa una nueva instancia de TiendaMuebles.
+        """
+        self._inventario = []
+        self._ventas_realizadas = []
+        self._comedores = []
+        self._descuentos_activos = {}
+        self._total_muebles_vendidos = 0
+        self._valor_total_ventas = 0.0
+
+    @property
+    def inventario(self) -> List[Mueble]:
+        """
+        Propiedad que expone el inventario de la tienda.
+        
+        Returns:
+            List[Mueble]: Lista de productos en el inventario
+        """
+        return self._inventario
+
+    def agregar_producto(self, producto: Mueble) -> None:
+        """
+        Agrega un producto al inventario de la tienda.
+        
+        Args:
+            producto (Mueble): El producto a agregar al inventario
+        """
+        self._inventario.append(producto)
+        if isinstance(producto, Comedor):
+            self._comedores.append(producto)
+
+    def vender_producto(self, nombre_producto: str) -> bool:
+        """
+        Vende un producto del inventario si existe.
+        
+        Args:
+            nombre_producto (str): El nombre del producto a vender
+            
+        Returns:
+            bool: True si se vendió el producto, False si no se encontró
+        """
+        for i, producto in enumerate(self._inventario):
+            if producto.nombre == nombre_producto:
+                vendido = self._inventario.pop(i)
+                if isinstance(vendido, Comedor):
+                    self._comedores.remove(vendido)
+                self._ventas_realizadas.append(vendido)
+                self._total_muebles_vendidos += 1
+                self._valor_total_ventas += vendido.calcular_precio()
+                print(f"Producto {nombre_producto} vendido")
+                return True
+        return False
+
     def obtener_estadisticas(self) -> dict:
         """
         Retorna estadísticas básicas y acumulativas de la tienda para la UI.

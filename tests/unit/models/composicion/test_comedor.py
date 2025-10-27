@@ -6,8 +6,8 @@ from src.models.concretos.silla import Silla
 class TestComedor:
     @pytest.fixture
     def comedor_basico(self):
-        mesa = Mesa("Mesa Comedor", "Roble", 200.0, "Rectangular", 6)
-        sillas = [Silla("Silla Comedor", "Roble", 50.0, 4, "Roble") for _ in range(6)]
+        mesa = Mesa("Mesa Comedor", "Roble", "Roble", 200.0, "rectangular", capacidad_personas=6)
+        sillas = [Silla("Silla Comedor", "Roble", "Roble", 50.0, tiene_respaldo=True) for _ in range(6)]
         return Comedor("Comedor Familiar", mesa, sillas)
     
     def test_composicion_correcta(self, comedor_basico):
@@ -17,6 +17,9 @@ class TestComedor:
         assert all(isinstance(silla, Silla) for silla in comedor_basico.sillas)
     
     def test_calcular_precio_total(self, comedor_basico):
+        # Los precios incluyen factores de modificación (material, tamaño, etc.)
+        mesa_precio = comedor_basico.mesa.calcular_precio()
+        silla_precio = comedor_basico.sillas[0].calcular_precio()
+        precio_esperado = mesa_precio + (6 * silla_precio)
         precio_total = comedor_basico.calcular_precio()
-        precio_esperado = 200.0 + (6 * 50.0)  # Mesa + 6 sillas
         assert precio_total == precio_esperado

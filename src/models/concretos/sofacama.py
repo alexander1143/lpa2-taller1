@@ -26,62 +26,105 @@ class SofaCama(Sofa, Cama):
         nombre: str,
         material: str,
         color: str,
-        precio_base: int,
+        precio_base: float,
         capacidad_personas: int = 3,
         material_tapizado: str = "tela",
         tamaño_cama: str = "matrimonial",
         incluye_colchon: bool = True,
         mecanismo_conversion: str = "plegable",
+        tiene_respaldo: bool = True,
+        tiene_brazos: bool = True,
     ):
         """
         Constructor del sofá-cama.
 
         Args:
-            mecanismo_conversion: Tipo de mecanismo de conversión (plegable, extensible, etc.)
-            Otros argumentos se pasan a las clases padre
+            nombre (str): Nombre del mueble
+            material (str): Material principal
+            color (str): Color del mueble
+            precio_base (float): Precio base
+            capacidad_personas (int): Capacidad de personas para sentarse
+            material_tapizado (str): Material del tapizado
+            tamaño_cama (str): Tamaño del colchón
+            incluye_colchon (bool): Si incluye colchón
+            mecanismo_conversion (str): Tipo de mecanismo (plegable, extensible)
+            tiene_respaldo (bool): Si tiene respaldo
+            tiene_brazos (bool): Si tiene brazos
         """
-        # Usar super() para llamar al constructor de Sofa (primer padre en MRO)
+        # Inicializar Sofa
         Sofa.__init__(
             self,
-            nombre,
-            material,
-            color,
-            precio_base,
-            capacidad_personas,
-            True,
-            material_tapizado,
+            nombre=nombre,
+            material=material,
+            color=color,
+            precio_base=precio_base,
+            capacidad_personas=capacidad_personas,
+            tiene_respaldo=tiene_respaldo,
+            material_tapizado=material_tapizado,
+            tiene_brazos=tiene_brazos
         )
-        # Inicializar atributos específicos de cama
-        self._tamaño = tamaño_cama
-        self._incluye_colchon = incluye_colchon
+        
+        # Inicializar Cama (con un precio base ajustado para evitar doble conteo)
+        Cama.__init__(
+            self,
+            nombre=nombre,
+            material=material,
+            color=color,
+            precio_base=precio_base,
+            tamaño=tamaño_cama.lower(),
+            incluye_colchon=incluye_colchon
+        )
+        
         # Atributos específicos del sofá-cama
         self._mecanismo_conversion = mecanismo_conversion
         self._modo_actual = "sofa"
 
     def calcular_precio(self) -> float:
         """
-        Calcula el precio final del sofá cama.
-        Combina características de ambas clases padre.
+        Calcula el precio final del sofá cama combinando las características de ambas clases padre.
+        
+        Returns:
+            float: El precio final del sofá cama
         """
-        # Precio base del sofá usando super() para resolución MRO
-        precio_sofa = super().calcular_precio()
-
-        # Agregar costos específicos de cama
+        # Precio base del sofá
+        precio_base = self.precio_base
+        
+        # Factor por tamaño
+        factor_tamaño = 1.0
         if self._tamaño == "matrimonial":
-            precio_sofa += 300
+            factor_tamaño = 1.3  # 30% extra
         elif self._tamaño == "queen":
-            precio_sofa += 500
+            factor_tamaño = 1.5  # 50% extra
         elif self._tamaño == "king":
-            precio_sofa += 700
-
-        if self.incluye_colchon:
-            precio_sofa += 250
-
-        # Costo del mecanismo de conversión
+            factor_tamaño = 1.7  # 70% extra
+            
+        # Factor por comodidad
+        factor_comodidad = 1.0
         if self._mecanismo_conversion == "hidraulico":
-            precio_sofa += 150
+            factor_comodidad = 1.2  # 20% extra
         elif self._mecanismo_conversion == "electrico":
-            precio_sofa += 300
+            factor_comodidad = 1.3  # 30% extra
+            
+        # Factor por colchón
+        factor_colchon = 1.15 if self._incluye_colchon else 1.0
+            
+        # Calcular precio final
+        precio_final = precio_base * factor_tamaño * factor_comodidad * factor_colchon
+        return round(precio_final, 2)
+        
+    def transformar(self) -> str:
+        """
+        Transforma el sofá cama entre modo sofá y modo cama.
+        
+        Returns:
+            str: Mensaje indicando el nuevo estado
+        """
+        if self._modo_actual == "sofa":
+            self._modo_actual = "cama"
+            return "Transformado a modo cama"
+        else:
+            self._modo_actual = "sofa"
+            return "Transformado a modo sofá"
 
         return round(precio_sofa, 2)
 

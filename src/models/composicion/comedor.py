@@ -98,6 +98,16 @@ class Comedor:
         precio_total = self._mesa.calcular_precio()
         for silla in self._sillas:
             precio_total += silla.calcular_precio()
+        return precio_total
+
+    def calcular_precio(self) -> float:
+        """
+        Alias para calcular_precio_total() para mantener consistencia con la interfaz de Mueble.
+        
+        Returns:
+            float: Precio total del comedor
+        """
+        return self.calcular_precio_total()
         if len(self._sillas) >= 4:
             precio_total *= 0.95  # 5% de descuento
         return round(precio_total, 2)
