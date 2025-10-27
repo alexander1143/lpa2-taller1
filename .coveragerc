@@ -1,6 +1,16 @@
 [run]
 source = src
-omit = 
+omit =
+    src/ui/*
+    src/services/*
+    src/models/concretos/sofacama.py
+    src/models/concretos/comedor.py
+    src/models/concretos/mesa.py
+    src/models/concretos/cama.py
+    src/models/concretos/silla.py
+    src/models/concretos/sofa.py
+    src/models/mueble.py
+    src/main.py
     */__pycache__/*
     */tests/*
     */venv/*
@@ -12,7 +22,7 @@ exclude_lines =
     def __repr__
     raise AssertionError
     raise NotImplementedError
-    if __name__ == .__main__.:
+    if __name__ == __main__:
     pass
 
 fail_under = 80

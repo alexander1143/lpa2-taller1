@@ -18,6 +18,55 @@
 - Conocimientos de OOP con Python
 - Familiaridad con los conceptos de abstracción, herencia, polimorfismo
 
+## Instalación y Configuración
+
+1. Crear y activar entorno virtual:
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+```
+
+2. Instalar dependencias:
+```bash
+pip install -r requirements.txt
+```
+
+## Ejecución de Pruebas
+
+### Ejecutar todas las pruebas:
+```bash
+pytest
+```
+
+### Ejecutar pruebas con cobertura:
+```bash
+pytest --cov=src --cov-report=term-missing
+```
+
+### Generar reporte HTML de cobertura:
+```bash
+pytest --cov=src --cov-report=html
+```
+El reporte se generará en el directorio `htmlcov/`
+
+### Ejecutar pruebas específicas:
+```bash
+# Por módulo
+pytest tests/unit/models/test_mueble.py
+
+# Por categoría
+pytest tests/unit/models/categorias/
+pytest tests/unit/models/concretos/
+pytest tests/unit/services/
+
+# Por clase de prueba
+pytest tests/unit/models/test_mueble.py::TestMueble
+
+# Por método de prueba específico
+pytest tests/unit/models/test_mueble.py::TestMueble::test_inicializacion
+```
+
 ## Estructura del Proyecto
 
 ```

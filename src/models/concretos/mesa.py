@@ -23,6 +23,15 @@ class Mesa(Superficie):
         altura: float = 75.0,
         capacidad_personas: int = 4,
     ):
+        # Validar forma
+        formas_validas = ["rectangular", "redonda", "cuadrada", "ovalada"]
+        if forma not in formas_validas:
+            raise ValueError(f"Forma debe ser una de: {formas_validas}")
+
+        # Validar capacidad
+        if capacidad_personas <= 0:
+            raise ValueError("La capacidad debe ser mayor a 0")
+
         super().__init__(nombre, material, color, precio_base, largo, ancho, altura)
         self._forma = forma
         self._capacidad_personas = capacidad_personas
@@ -53,24 +62,23 @@ class Mesa(Superficie):
         self._capacidad_personas = value
 
     def calcular_precio(self) -> float:
-        """Calcula el precio final de la mesa."""
+        """
+        Calcula el precio final de la mesa.
+        - Factor de tamaño base
+        - +50 por forma no rectangular
+        - +100 por capacidad >4 personas
+        """
         precio = self.precio_base
-
-        # Aplicar factor de tamaño
-        factor_tamaño = self.calcular_factor_tamaño()
-        precio *= factor_tamaño
-
-        # Ajuste por forma
+        precio *= self.calcular_factor_tamaño()
+        # Ajuste por forma (valor absoluto según tests)
         if self.forma != "rectangular":
             precio += 50
 
-        # Ajuste por capacidad de personas
-        if self.capacidad_personas > 6:
+        # Ajuste por capacidad de personas (valor absoluto según tests)
+        if self.capacidad_personas > 4:
             precio += 100
-        elif self.capacidad_personas > 4:
-            precio += 50
 
-        return round(precio, 2)
+        return precio
 
     def obtener_descripcion(self) -> str:
         """

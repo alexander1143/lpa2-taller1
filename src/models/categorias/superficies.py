@@ -33,7 +33,17 @@ class Superficie(Mueble, ABC):
             largo: Largo de la superficie en cm
             ancho: Ancho de la superficie en cm
             altura: Altura de la superficie en cm
+
+        Raises:
+            ValueError: Si alguna dimensión es menor o igual a 0
         """
+        if largo <= 0:
+            raise ValueError("El largo debe ser mayor a 0")
+        if ancho <= 0:
+            raise ValueError("El ancho debe ser mayor a 0")
+        if altura <= 0:
+            raise ValueError("La altura debe ser mayor a 0")
+
         super().__init__(nombre, material, color, precio_base)
         self._largo = largo
         self._ancho = ancho
@@ -87,13 +97,16 @@ class Superficie(Mueble, ABC):
     def calcular_factor_tamaño(self) -> float:
         """
         Calcula un factor basado en el tamaño de la superficie.
+        Factor base 1.0 + 0.1 por cada 5000 cm²
 
         Returns:
-            float: Factor multiplicador para el precio
+            float: Factor multiplicador para el precio (mínimo 1.0)
         """
         area = self.calcular_area()
-        # Factor basado en área (cada 10000 cm² = +5%)
-        factor = 1.0 + (area / 10000) * 0.05
+        # Para áreas muy pequeñas no aplicamos el incremento
+        if area < 5000:
+            return 1.0
+        factor = 1.0 + (area / 5000) * 0.1
         return factor
 
     def obtener_info_superficie(self) -> str:

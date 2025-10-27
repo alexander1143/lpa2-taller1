@@ -22,19 +22,38 @@ class Almacenamiento(Mueble, ABC):
         material: str,
         color: str,
         precio_base: float,
-        num_compartimentos: int,
-        capacidad_litros: float,
+        altura: float,
+        ancho: float,
+        profundidad: float,
+        num_compartimentos: int = 1,
     ):
         """
         Constructor para muebles de almacenamiento.
 
         Args:
+            altura: Altura del mueble en cm
+            ancho: Ancho del mueble en cm
+            profundidad: Profundidad del mueble en cm
             num_compartimentos: Número de compartimentos/divisiones
-            capacidad_litros: Capacidad en litros de almacenamiento
+
+        Raises:
+            ValueError: Si alguna dimensión es menor o igual a 0
+            ValueError: Si el número de compartimentos es menor o igual a 0
         """
+        if altura <= 0:
+            raise ValueError("La altura debe ser mayor a 0")
+        if ancho <= 0:  
+            raise ValueError("El ancho debe ser mayor a 0")
+        if profundidad <= 0:
+            raise ValueError("La profundidad debe ser mayor a 0")
+        if num_compartimentos <= 0:
+            raise ValueError("El número de compartimentos debe ser mayor o igual a 0")
+
         super().__init__(nombre, material, color, precio_base)
+        self._altura = altura
+        self._ancho = ancho 
+        self._profundidad = profundidad
         self._num_compartimentos = num_compartimentos
-        self._capacidad_litros = capacidad_litros
 
     @property
     def num_compartimentos(self) -> int:
@@ -49,16 +68,61 @@ class Almacenamiento(Mueble, ABC):
         self._num_compartimentos = value
 
     @property
-    def capacidad_litros(self) -> float:
-        """Getter para capacidad en litros."""
-        return self._capacidad_litros
+    def altura(self) -> float:
+        """Getter para la altura del mueble."""
+        return self._altura
 
-    @capacidad_litros.setter
-    def capacidad_litros(self, value: float) -> None:
-        """Setter para capacidad con validación."""
+    @altura.setter
+    def altura(self, value: float) -> None:
+        """Setter para altura con validación."""
         if value <= 0:
-            raise ValueError("La capacidad debe ser mayor a 0")
-        self._capacidad_litros = value
+            raise ValueError("La altura debe ser mayor a 0")
+        self._altura = value
+
+    @property
+    def ancho(self) -> float:
+        """Getter para el ancho del mueble."""
+        return self._ancho
+
+    @ancho.setter
+    def ancho(self, value: float) -> None:
+        """Setter para ancho con validación."""
+        if value <= 0:
+            raise ValueError("El ancho debe ser mayor a 0")
+        self._ancho = value
+
+    @property
+    def profundidad(self) -> float:
+        """Getter para la profundidad del mueble."""
+        return self._profundidad
+
+    @profundidad.setter
+    def profundidad(self, value: float) -> None:
+        """Setter para profundidad con validación."""
+        if value <= 0:
+            raise ValueError("La profundidad debe ser mayor a 0")
+        self._profundidad = value
+
+    def calcular_volumen(self) -> float:
+        """
+        Calcula el volumen del mueble en cm³.
+
+        Returns:
+            float: Volumen en centímetros cúbicos
+        """
+        return self.altura * self.ancho * self.profundidad
+
+    def calcular_factor_volumen(self) -> float:
+        """
+        Calcula el factor de precio basado en el volumen.
+        A mayor volumen, mayor precio base.
+
+        Returns:
+            float: Factor multiplicador por volumen 
+            Factor base 1.0 + 0.1 por cada 100000 cm³
+        """
+        volumen = self.calcular_volumen()
+        return 1.0 + (volumen / 100000) * 0.1
 
     def calcular_factor_almacenamiento(self) -> float:
         """
@@ -70,8 +134,8 @@ class Almacenamiento(Mueble, ABC):
         factor = 1.0
         # Más compartimentos = más funcionalidad
         factor += (self.num_compartimentos - 1) * 0.05
-        # Mayor capacidad = mayor precio
-        factor += (self.capacidad_litros / 100) * 0.02
+        # Factor por volumen
+        factor *= self.calcular_factor_volumen()
         return factor
 
     def obtener_info_almacenamiento(self) -> str:

@@ -4,12 +4,18 @@ Representa una cama genérica.
 """
 
 from ..mueble import Mueble
-
-
 class Cama(Mueble):
     """
     Clase concreta que representa una cama.
     """
+
+    # Factores de precio por tamaño
+    FACTORES_TAMAÑO = {
+        "individual": 1.0,
+        "matrimonial": 1.3,
+        "queen": 1.5,
+        "king": 1.7,
+    }
 
     def __init__(
         self,
@@ -21,6 +27,12 @@ class Cama(Mueble):
         incluye_colchon: bool = False,
         tiene_cabecera: bool = False,
     ):
+        """
+        Inicializa una instancia de Cama.
+        """
+        if tamaño not in self.FACTORES_TAMAÑO:
+            raise ValueError(f"Tamaño debe ser uno de: {list(self.FACTORES_TAMAÑO.keys())}")
+
         super().__init__(nombre, material, color, precio_base)
         self._tamaño = tamaño
         self._incluye_colchon = incluye_colchon
@@ -28,51 +40,32 @@ class Cama(Mueble):
 
     @property
     def tamaño(self) -> str:
-        """Getter para tamaño."""
         return self._tamaño
 
     @tamaño.setter
     def tamaño(self, value: str) -> None:
-        """Setter para tamaño con validación."""
-        tamaños_validos = ["individual", "matrimonial", "queen", "king"]
-        if value not in tamaños_validos:
-            raise ValueError(f"Tamaño debe ser uno de: {tamaños_validos}")
+        if value not in self.FACTORES_TAMAÑO:
+            raise ValueError(f"Tamaño debe ser uno de: {list(self.FACTORES_TAMAÑO.keys())}")
         self._tamaño = value
 
     @property
     def incluye_colchon(self) -> bool:
-        """Getter para colchón."""
         return self._incluye_colchon
 
     @property
     def tiene_cabecera(self) -> bool:
-        """Getter para cabecera."""
         return self._tiene_cabecera
 
     def calcular_precio(self) -> float:
-        """Calcula el precio final de la cama."""
         precio = self.precio_base
-
-        # Ajuste por tamaño
-        if self.tamaño == "matrimonial":
-            precio += 200
-        elif self.tamaño == "queen":
-            precio += 400
-        elif self.tamaño == "king":
-            precio += 600
-
-        # Extras
+        precio *= self.FACTORES_TAMAÑO[self.tamaño]
         if self.incluye_colchon:
-            precio += 300
+            precio *= 1.15
         if self.tiene_cabecera:
-            precio += 100
-
-        return round(precio, 2)
+            precio *= 1.1
+        return precio
 
     def obtener_descripcion(self) -> str:
-        """
-        Retorna una descripción detallada de la cama.
-        """
         desc = f"Cama: {self.nombre}\n"
         desc += f"  Material: {self.material}\n"
         desc += f"  Color: {self.color}\n"

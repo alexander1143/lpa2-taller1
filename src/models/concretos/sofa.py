@@ -62,12 +62,13 @@ class Sofa(Asiento):
         precio *= factor_comodidad
 
         # Características específicas del sofá
+        # Aplicar factores multiplicativos según los tests
         if self.tiene_brazos:
-            precio += 150
+            precio *= 1.1  # 10% extra por brazos
         if self.es_modular:
-            precio += 200
+            precio *= 1.2  # 20% extra por modular
         if self.incluye_cojines:
-            precio += 50
+            precio *= 1.1  # 10% extra por cojines
 
         return round(precio, 2)
 

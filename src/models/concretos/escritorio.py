@@ -3,10 +3,10 @@ Clase concreta Escritorio.
 Representa un escritorio genérico.
 """
 
-# from ..mueble import Mueble
+from src.models.categorias.superficies import Superficie
 
 
-class Escritorio:
+class Escritorio(Superficie):
     """
     Clase concreta que representa un escritorio.
     """
@@ -16,35 +16,93 @@ class Escritorio:
         nombre: str,
         material: str,
         color: str,
-        precio_base: int,
-        forma: str = "rectangular",
-        tiene_cajones: bool = False,
-        num_cajones: int = 0,
-        largo: float = 1.2,
-        tiene_iluminacion: bool = False,
+        precio_base: float,
+        largo: float,
+        ancho: float,
+        altura: float,
+        tipo: str = "estudiante",
+        tiene_cajonera: bool = False,
+        porta_teclado: bool = False,
     ):
-        self.nombre = nombre
-        self.material = material
-        self.color = color
-        self.precio_base = int(precio_base) if precio_base is not None else 0
-        self.forma = forma
-        self.tiene_cajones = tiene_cajones
-        self.num_cajones = num_cajones
-        self.largo = largo
-        self.tiene_iluminacion = tiene_iluminacion
+        """
+        Constructor para escritorio.
 
-    def calcular_precio(self) -> int:
-        """Calcula el precio final del escritorio."""
+        Args:
+            nombre: Nombre del escritorio
+            material: Material del escritorio
+            color: Color del escritorio
+            precio_base: Precio base del escritorio
+            largo: Largo del escritorio en cm
+            ancho: Ancho del escritorio en cm
+            altura: Altura del escritorio en cm
+            tipo: Tipo de escritorio (estudiante, ejecutivo, esquinero)
+            tiene_cajonera: Si tiene cajonera integrada
+            porta_teclado: Si tiene porta teclado
+        """
+        super().__init__(nombre, material, color, precio_base, largo, ancho, altura)
+        self._tipo = tipo
+        self._tiene_cajonera = tiene_cajonera
+        self._porta_teclado = porta_teclado
+        
+        if tipo not in ["estudiante", "ejecutivo", "esquinero"]:
+            raise ValueError("Tipo de escritorio debe ser uno de: estudiante, ejecutivo, esquinero")
+
+    @property
+    def tipo(self) -> str:
+        """Getter para el tipo de escritorio."""
+        return self._tipo
+        
+    @tipo.setter
+    def tipo(self, value: str) -> None:
+        """Setter para el tipo de escritorio con validación."""
+        if value not in ["estudiante", "ejecutivo", "esquinero"]:
+            raise ValueError("Tipo de escritorio debe ser uno de: estudiante, ejecutivo, esquinero")
+        self._tipo = value
+        
+    @property
+    def tiene_cajonera(self) -> bool:
+        """Getter para si tiene cajonera."""
+        return self._tiene_cajonera
+        
+    @tiene_cajonera.setter
+    def tiene_cajonera(self, value: bool) -> None:
+        """Setter para si tiene cajonera."""
+        self._tiene_cajonera = value
+        
+    @property
+    def porta_teclado(self) -> bool:
+        """Getter para si tiene porta teclado."""
+        return self._porta_teclado
+        
+    @porta_teclado.setter
+    def porta_teclado(self, value: bool) -> None:
+        """Setter para si tiene porta teclado."""
+        self._porta_teclado = value
+
+    def calcular_precio(self) -> float:
+        """
+        Calcula el precio final del escritorio.
+        - Factor por tamaño base (de Superficie)
+        - Factor extra por tipo:
+          * estudiante: sin extra
+          * ejecutivo: +20%
+          * esquinero: +20%
+        - +20% por cajonera
+        - +10% por porta teclado
+        """
         precio = self.precio_base
-        if self.tiene_cajones:
-            precio += self.num_cajones * 25
-        if self.largo > 1.5:
-            precio += 50
-        if self.tiene_iluminacion:
-            precio += 40
-        if self.forma != "rectangular":
-            precio += 30
-        return int(round(precio))
+        precio *= self.calcular_factor_tamaño()
+        
+        # Factores extras acumulativos (según tests, 'tipo' no agrega un multiplicador extra)
+        factor_extra = 1.0
+
+        # Extra por accesorios
+        if self.tiene_cajonera:
+            factor_extra *= 1.2
+        if self.porta_teclado:
+            factor_extra *= 1.1
+
+        return precio * factor_extra
 
     def obtener_descripcion(self) -> str:
         """

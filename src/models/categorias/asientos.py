@@ -20,14 +20,16 @@ class Asiento(Mueble, ABC):
     - Polimorfismo: Permite diferentes implementaciones del cálculo de comodidad
     """
 
+    MATERIALES_TAPIZADO_VALIDOS = ["tela", "cuero"]
+
     def __init__(
         self,
         nombre: str,
         material: str,
         color: str,
         precio_base: float,
-        capacidad_personas: int,
-        tiene_respaldo: bool,
+        capacidad_personas: int = 1,
+        tiene_respaldo: bool = False,
         material_tapizado: str = None,
     ):
         """
@@ -38,12 +40,22 @@ class Asiento(Mueble, ABC):
             tiene_respaldo: Si el asiento tiene respaldo o no
             material_tapizado: Material del tapizado (opcional)
             Otros argumentos heredados de Mueble
+
+        Raises:
+            ValueError: Si la capacidad es menor o igual a 0
+            ValueError: Si el material de tapizado no es válido
         """
+        if capacidad_personas <= 0:
+            raise ValueError("La capacidad debe ser mayor a 0")
+        
+        if material_tapizado and material_tapizado.lower() not in self.MATERIALES_TAPIZADO_VALIDOS:
+            raise ValueError(f"Material tapizado debe ser uno de {self.MATERIALES_TAPIZADO_VALIDOS}")
+
         super().__init__(nombre, material, color, precio_base)
 
         self._capacidad_personas = capacidad_personas
         self._tiene_respaldo = tiene_respaldo
-        self._material_tapizado = material_tapizado
+        self._material_tapizado = material_tapizado.lower() if material_tapizado else None
 
     @property
     def capacidad_personas(self) -> int:
@@ -84,22 +96,25 @@ class Asiento(Mueble, ABC):
 
         Returns:
             float: Factor multiplicador para el precio (1.0 = neutral)
+                  +0.1 por respaldo
+                  +0.1 por material tela
+                  +0.2 por material cuero
         """
         factor = 1.0
 
+        # Factor por respaldo
         if self.tiene_respaldo:
             factor += 0.1
 
+        # Factor por material de tapizado
         if self.material_tapizado:
             if self.material_tapizado.lower() == "cuero":
                 factor += 0.2
             elif self.material_tapizado.lower() == "tela":
                 factor += 0.1
 
-        # Factor adicional por capacidad
-        factor += (self.capacidad_personas - 1) * 0.05
-
-        return factor
+        # Redondear a 2 decimales para evitar pequeñas imprecisiones flotantes
+        return round(factor, 2)
 
     def obtener_info_asiento(self) -> str:
         """
